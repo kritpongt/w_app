@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/test.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css"/>
+    <title>Document</title>
+</head>
+<body>
+    <div class="topnav" id="topnav">
+        <a href="#" class="active">Editor</a>
+        <a href="javascript:void(0);" class="icon" onclick="topnavFunction()">
+            <i class="fa fa-bars"></i>
+        </a>
+        <div class="dowloand-container">
+            <button class="btnDownload" onclick="downloadZip()">
+                <i class="fa fa-download"> Download</i>
+            </button>
+        </div>
+        <div class="selected-container">
+            <select id="selected">
+                <option>Zyxel</option>
+                <option>My Web Page</option>
+                <option>Coming soon..</option>
+                <option>Coming soon..</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="trytopnav">
+        <div class="w3-bar" style="overflow: auto;">
+            <span style="padding: 8px 8px; display: block; float: right;">
+                <span id="framesize">
+                    <span></span>
+                </span>
+            </span>
+        </div>
+    </div>
+    <div id="shield" style="display: none;"></div>
+    <a href="javascript:void(0)" id="dragbar" style="width: 5px; top: 138px; cursor: col-resize;"></a>
+    <div id="container">
+        <div id="textareacontainer">
+            <div id="textarea">
+                <div id="textareawrapper">
+                    <ul class="tabsBar">
+                        <li class="tab">
+                            <input type="radio" name="tabs" checked="checked" id="tab1">
+                            <label for="tab1">templates</label>
+                            <div id="tabContent-1" class="content">
+                                <div id="btnCategory">
+                                    <button class="btn active" onclick="filterSelection('all')">Show all</button>
+                                    <button class="btn" onclick="filterSelection('zyxel')">Zyxel</button>
+                                    <button class="btn" onclick="filterSelection('mywebpage')">My WebPage</button>
+                                    <button class="btn" onclick="filterSelection('comingsoon')">Coming Soon</button>
+                                </div>
+                                <div class="templateRow">
+                                    <div class="item zyxel">
+                                        <div class="templateContent" id="z_loginPage">
+                                            <img src="img/zyxel_logo1.jpg" style="width: 100%;">
+                                            <h4>Login Page</h4>
+                                        </div>
+                                    </div>
+                                    <div class="item zyxel">
+                                        <div class="templateContent" id="z_sessionPage">
+                                            <img src="img/zyxel_logo1.jpg" style="width: 100%;">
+                                            <h4>Session Page</h4>
+                                        </div>
+                                    </div>
+                                    <div class="item zyxel">
+                                        <div class="templateContent" id="z_logoutPage">
+                                            <img src="img/zyxel_logo1.jpg" style="width: 100%;">
+                                            <h4>Logout Page</h4>
+                                        </div>
+                                    </div>
+                                    <div class="item mywebpage">
+                                        <div class="templateContent" id="my_loginPage">
+                                            <img src="img/responsive.png" style="width: 100%;">
+                                            <h4>Login Page</h4>
+                                        </div>
+                                    </div>
+                                    <div class="item mywebpage">
+                                        <div class="templateContent" id="my_welcomePage">
+                                            <img src="img/responsive.png" style="width: 100%;">
+                                            <h4>Welcome Page</h4>
+                                        </div>
+                                    </div>
+                                    <div class="item mywebpage">
+                                        <div class="templateContent">
+                                            <img src="img/responsive.png" style="width: 100%;">
+                                            <h4>coming soon..</h4>
+                                        </div>
+                                    </div>
+                                    <!--  -->
+                                    <div class="item comingsoon">
+                                        <div class="templateContent">
+                                            <img src="" style="width: 100%;">
+                                            <h4>coming soon</h4>
+                                        </div>
+                                    </div>
+                                    <div class="item comingsoon">
+                                        <div class="templateContent">
+                                            <img src="" style="width: 100%;">
+                                            <h4>coming soon</h4>
+                                        </div>
+                                    </div>
+                                    <div class="item comingsoon">
+                                        <div class="templateContent">
+                                            <img src="" style="width: 100%;">
+                                            <h4>coming soon</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="tab">
+                            <input type="radio" name="tabs" id="tab2">
+                            <label for="tab2">customize</label>
+                            <div id="tabContent-2" class="content">
+                                <div class="accordion-container1" id="acc1">
+                                    <button class="accordion">Change Logo</button>
+                                    <div class="panel">
+                                        <input type="file" onchange="uploadFile01()" id="fileInput01">
+                                    </div>
+                                    <button class="accordion">Change Background</button>
+                                    <div class="panel">
+                                        <input type="file" onchange="uploadFile02()" id="fileInput02">
+                                    </div>
+                                    <button class="accordion">Coming Soon..</button>
+                                </div>
+                                <div class="accordion-container2" id="acc2">
+                                    <button class="accordion">Change Image</button>
+                                    <div class="panel">
+                                        <input type="file" onchange="uploadFile03()" id="fileInput03">
+                                    </div>
+                                    <button class="accordion">Change Background</button>
+                                    <div class="panel">
+                                        <input type="file" onchange="uploadFile04()" id="fileInput04">
+                                    </div>
+                                    <button class="accordion">Change Color</button>
+                                    <div class="panel">
+                                        <div class="color-picker"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="tab">
+                            <input type="radio" name="tabs" id="tab3">
+                            <label for="tab3">html</label>
+                            <div id="tabContent-3" class="content">
+                                <div id="htmlEditor" style="height: 100%;"></div>
+                            </div>
+                        </li>
+                        <li class="tab">
+                            <input type="radio" name="tabs" id="tab4">
+                            <label for="tab4">css</label>
+                            <div id="tabContent-4" class="content">
+                                <div id="cssEditor" style="height: 100%;"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="iframecontainer">
+            <div id="iframe">
+                <div id="iframewrapper">
+                    <iframe id="iframeResult" frameborder="0" name="iframeResult" allowfullscreen="true"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.6/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.2/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.2/dist/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <script src="/js/test.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta http-equiv="pragma" content="no-cache">
+    <link href="./css_m/jquery.mobile-1.4.2.min.css?v=181225040720" rel="stylesheet" type="text/css">
+    <link href="./css_m/style.css?v=181225040720" rel="stylesheet" type="text/css">
+    <link href="./css_m/theme.css?v=181225040720" rel="stylesheet" type="text/css">
+	<script src="./js/jquery-1.8.2.min.js?v=181225040720"></script>
+    <script src="./js/jquery.mobile-1.4.2.min.js?v=181225040720"></script>
+<script language="JavaScript">
+var mp_idx = getQueryString("mp_idx");
+function getQueryString(paramName){
+	paramName = paramName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]").toLowerCase();
+	var reg = "[\\?&]"+paramName +"=([^&#]*)"; 
+	var regex = new RegExp( reg );
+	var regResults = regex.exec( window.location.href.toLowerCase() ); 
+	if( regResults == null ) return ""; 
+	else return regResults [1]; 
+}
+function initTask(){
+	$('#mp_idx').val(mp_idx);
+}
+function send(){
+	var field = 4;
+	var lable = "";
+	for(var i=1; i <= field; i++){
+		lable += $("#"+i).text() + "!@#";
+	}
+	/*get label value*/
+	$("#fieldname").val(lable);
+	document.form.submit();
+}
+
+</script>
+</head>
+<body onload="initTask();">
+
+<div data-role="page" class="zyxel zyxel_style1">
+
+  	<div data-role="header" class="zyxel_header">
+		<h1><img src="./images_m/logo_70X20_white.png?v=181225040720" width="70" height="20" alt="logo"></h1>
+ 	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+		<div class="zyxel_content">
+            <h2 class="zyxel_title">Welcome</h2>
+            <div class="zyxel_blue_line"></div>
+            
+            <p class="agree_title_style">To connect, please fill in you details:</p>
+            
+            <form name="form" action="/free_time.cgi"  method="post">
+                <label id="1" for="user_name" class="ui-hidden-accessible">User Name</label>
+                <input type="text" name="field1" id="user_name" value=""  placeholder="Name" class="zyxel_input_style">
+            
+                <label id="2" for="phone" class="ui-hidden-accessible">Phone</label>
+                <input type="tel" name="field2" id="phone" value=""  placeholder="Phone" class="zyxel_input_style">
+                
+                <label id="3" for="address" class="ui-hidden-accessible">Address</label>
+          		<input type="text"s name="field3" id="address" value=""  placeholder="Address" class="zyxel_input_style">
+                
+                <label id="4" for="email" class="ui-hidden-accessible">E-mail</label>
+                <input type="email" name="field4" id="email" value=""  placeholder="E-mail" class="zyxel_input_style">
+            
+                <div class="flow_hidden">
+                
+				<div class="center_to_right_rwd">
+                    <button onclick="send()" type="button" class="ui-btn ui-corner-all ui-btn-inline ui-btn-d btn_inline_style">Connect Now!</button>
+                </div>
+                <input type="hidden" name="ft_user_login" value="1"/> <!-- please don't modify this value. -->
+				<input type="hidden" id="fieldname" name="fieldname" value=""/>
+				<input type="hidden" id="mobile" name="mobile" value="1"/> 
+				<input type="hidden" id="mp_idx" name="mp_idx" value=""/>
+                </div><!-- /lflow_hidden-->
+            </form>
+     	</div><!-- /zyxel_content -->
+	</div><!-- /content -->
+</div><!-- /page -->
+</body>
+</html>

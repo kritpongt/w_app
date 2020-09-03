@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+<title>Welcome to Session</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="shortcut icon" href="$Z/images/logo.ico" type="image/x-icon"/>
+<script type="text/javascript" src="/ext-js/ext/ext-all.js?v=181225040720"></script>
+<link rel="stylesheet" type="text/css" href="$Z/css/portal.css?v=181225040720">
+<!--  -->
+<link rel="stylesheet" type="text/css" href="css/portal.css?v=181225040720">
+<link rel="shortcut icon" href="images/logo.ico" type="image/x-icon"/>
+<script language="JavaScript">
+var browser_close_with_logout = $B;
+var ahours = $h;
+var aminutes = $m;
+var asec =$s;
+var session_hour = $X;
+var session_min = $Y;
+var session_sec = $e;
+var Lhours =$u;
+var Lminutes = $l;
+var LSecs = $r;
+var DifferenceHour = -1;
+var DifferenceMinute = -1;
+var DifferenceSecond = -1;
+var Aday = new Date();
+var Lday = new Date();
+var Rday = new Date();
+var Sday = new Date();
+var _leasetime, _authtime, _remaining, _sessiontime;
+var username = '$n';
+var due_str = '$d'.split('-');
+var Leasesec = $r;
+var vpn_ip = '$v';
+var remaining_hour = $b;
+var remaining_min = $c;
+var remaining_sec = $E;
+var remaining_total_quota = '$T';
+var remaining_upload_quota = '$U';
+var remaining_download_quota = '$D';
+var do_logout = '$f'; /* control logout button's display*/
+var accumulation_flag = '$F';
+var logout_ip = '$H';
+var logout_ip_reload = false; /*Logout IP*/
+var mp_idx = '$M';
+var replenish_flag = $R;
+var trial_flag = $Tr;
+
+/* Lease Times*/
+Lday.setHours(Lday.getHours()+Lhours, Lday.getMinutes()+Lminutes, Lday.getSeconds()+Leasesec);
+/* Auth. Time */
+Aday.setHours(Aday.getHours()+ahours, Aday.getMinutes()+aminutes, Aday.getSeconds()+asec);
+/*Remaining Times*/
+Rday.setHours(Rday.getHours()+remaining_hour, Rday.getMinutes()+remaining_min, Rday.getSeconds()+remaining_sec);
+/* Session. Time */
+Sday.setHours(Sday.getHours()+session_hour, Sday.getMinutes()+session_min, Sday.getSeconds()+session_sec);
+
+var daysms = 24 * 60 * 60 * 1000;
+var hoursms = 60 * 60 * 1000;
+var Secondms = 60 * 1000;
+var microsecond = 1000;
+var Auth_time = ahours+':'+aminutes+':'+asec;
+var Lease = Lhours+ ':' + Lminutes+':'+Leasesec;
+
+var _String = {
+/* multi-Lingual here */
+	'title': username+' , You now have logged in.',
+	'content1': 'Click the logout button to terminate the access session. ',
+	'content2': 'You could renew your lease time by clicking the Renew button. ',
+	'content3': 'For security reason you must login again after '+ahours+' hours '+aminutes+' minutes '+asec+' second.',
+	'leaseTime': '-Remaining time before lease timeout (hh:mm:ss):',
+	'authTime': '-Remaining time before auth timeout (hh:mm:ss):',
+	'remainingTime': '-Remaining time before lease timeout (dd, hh:mm:ss):',
+	'sessionTime': '-Remaining time before session timeout (hh:mm:ss):',
+	'quotaTotal': '-Total remaining quota:',
+	'quotaUpload': '-Upload remaining quota:',
+	'quotaDownload': '-Download remaining quota:',
+	'mappingAddress': '-Mapped Public IP Address:',
+	'renew': 'Renew',
+	'logout': 'Logout',
+	'logoutIPMsg': 'If you want to regain the access page, you can enter the URL:http://' + logout_ip + '.'
+};
+
+function setString(){
+	document.getElementById('title').innerHTML = _String.title;
+	document.getElementById('leaseTime').innerHTML = _String.leaseTime;
+	document.getElementById('authTime').innerHTML = due_str== 'none' ? _String.authTime : 'Due Time:';
+	document.getElementById('mappingAddress').innerHTML = _String.mappingAddress;
+	document.getElementById('leaseTime').value = ahours+':'+aminutes+':'+ asec;
+	document.getElementById('remainingTime').innerHTML = _String.remainingTime;
+	document.getElementById('sessionTime').innerHTML = _String.sessionTime;
+	document.getElementById('quotaT').innerHTML = _String.quotaTotal;
+	document.getElementById('quotaU').innerHTML = _String.quotaUpload;
+	document.getElementById('quotaD').innerHTML = _String.quotaDownload;
+	document.getElementById('vpnip').value = vpn_ip;
+	document.getElementById('renew').value = _String.renew;
+	document.getElementById('logouts').value = _String.logout;
+	document.getElementById('note').innerHTML = _String.logoutIPMsg;
+	initTask();
+}
+
+function reNew(){
+	logout_ip_reload = true;
+	document.renew.submit();
+}
+function auTime(){
+	var curtime = new Date();
+	var Diffms = Aday.getTime() - curtime.getTime();
+	if(Diffms < 0){
+		clearInterval(_leasetime);
+		clearInterval(_authtime);
+		clearInterval(_sessiontime);
+		logout_ip_reload = true;
+		alert("Authentication Timeout.");
+		document.timeout.submit();
+		return;
+  	}
+	DifferenceHour = Math.floor(Diffms / daysms);
+  	Diffms -= DifferenceHour * daysms;
+	DifferenceMinute = Math.floor(Diffms / hoursms);
+	Diffms -= DifferenceMinute * hoursms;
+	DifferenceSecond = Math.floor(Diffms / Secondms);
+  	Diffms -= DifferenceSecond * Secondms;
+	var dSecs = Math.floor(Diffms / microsecond);
+
+ 	var diffAuthMin = time_format(DifferenceMinute, "00");
+	var diffAuthSec = time_format(DifferenceSecond, "00");
+	var dAuthSec = time_format(dSecs, "00");
+	if(due_str == 'none'){
+		document.renew.authtime.value = diffAuthMin+":"+diffAuthSec+":"+dAuthSec;
+	}else{
+		document.renew.authtime.value = due_str[0]+'/'+due_str[1]+'/'+due_str[2]+' '+due_str[3]+':'+due_str[4];
+	}
+}
+function letime(){
+	var curtime = new Date();
+	var Diffms = Lday.getTime() - curtime.getTime();
+	if(Diffms < 0){
+		clearInterval(_leasetime);
+		clearInterval(_authtime);
+		clearInterval(_sessiontime);
+		logout_ip_reload = true;
+		alert("Lease Timeout.");
+		document.timeout.submit();
+		return;
+  	}
+	DifferenceHour = Math.floor(Diffms / daysms);
+ 	Diffms -= DifferenceHour * daysms;
+	DifferenceMinute = Math.floor(Diffms / hoursms);
+  	Diffms -= DifferenceMinute * hoursms;
+	DifferenceSecond = Math.floor(Diffms / Secondms);
+  	Diffms -= DifferenceSecond * Secondms;
+
+	var dSecs = Math.floor(Diffms / microsecond);
+  	var diffMin = time_format(DifferenceMinute, "00");
+	var diffSec = time_format(DifferenceSecond, "00");
+	var dSec = time_format(dSecs, "00");
+	
+	document.renew.leasetime.value = diffMin+":"+diffSec+":"+dSec;
+}
+function dynamicuser(){
+	var curtime = new Date();
+	var convertHour = DifferenceHour;
+	var convertMinute = DifferenceMinute;
+	var convertSecond = DifferenceSecond;
+	
+	var Diffms = Rday.getTime() - curtime.getTime();
+	if(Diffms < 0){
+		clearInterval(_remaining);
+		logout_ip_reload = true;
+		alert("Lease Timeout.");
+		document.timeout.submit();
+		return;
+	}
+	DifferenceHour = Math.floor(Diffms / daysms);
+	Diffms -= DifferenceHour * daysms;
+	DifferenceMinute = Math.floor(Diffms / hoursms);
+	Diffms -= DifferenceMinute * hoursms;
+	DifferenceSecond = Math.floor(Diffms / Secondms);
+	Diffms -= DifferenceSecond * Secondms;
+
+	var dSecs = Math.floor(Diffms / microsecond);
+	
+	var diffday = time_format(DifferenceHour, "00")
+	var diffMin = time_format(DifferenceMinute, "00");
+	var diffSec = time_format(DifferenceSecond, "00");
+	var dSec = time_format(dSecs, "00");
+	document.renew.remaining_time.value = diffday+" day, "+diffMin+":"+diffSec+":"+dSec;
+}
+function Sesstime(){
+	var curtime = new Date();
+	var Diffms = Sday.getTime() - curtime.getTime();
+
+	if(Diffms < 0){
+		clearInterval(_leasetime);
+		clearInterval(_authtime);
+		clearInterval(_sessiontime);
+		logout_ip_reload = true;
+		alert("Session Timeout.");
+		document.timeout.submit();
+		return;
+  	}
+	DifferenceHour = Math.floor(Diffms / daysms);
+ 	Diffms -= DifferenceHour * daysms;
+	DifferenceMinute = Math.floor(Diffms / hoursms);
+  	Diffms -= DifferenceMinute * hoursms;
+	DifferenceSecond = Math.floor(Diffms / Secondms);
+	Diffms -= DifferenceSecond * Secondms;
+
+	var dSecs = Math.floor(Diffms / microsecond);
+ 	var diffMin = time_format(DifferenceMinute, "00");
+	var diffSec = time_format(DifferenceSecond, "00");
+	var dSec = time_format(dSecs, "00");
+	
+	document.renew.sessiontime.value = diffMin+":"+diffSec+":"+dSec;
+}
+function billingQuota() {
+	if(remaining_total_quota!="0"){
+		document.renew.quotaTotal.value = remaining_total_quota;
+	}
+	if(remaining_upload_quota!="0"){
+		document.renew.quotaUpload.value = remaining_upload_quota;
+	}
+	if(remaining_download_quota!="0"){
+		document.renew.quotaDownload.value = remaining_download_quota;
+	}
+}
+function time_format( covert_data, str_format ){
+	var str = covert_data.toString().replace(" ", "");
+	var length_add = str_format.length - str.length;
+	var str = str_format.substring(0,length_add) + str;
+	return str;
+}
+function Glogout(){
+	if (confirm("Are you sure you want to log out?")){
+		logout_ip_reload = true;
+		document.getElementById("logout_form").target = "_self";
+		document.logout.submit();
+	}
+}
+function do_Replenish(){
+	var x = true;
+	window.onbeforeunload = null;
+	if(trial_flag){
+		x = confirm("When Free-Time account upgrade to billing account. \nRemaining time of account erase.");
+   	}
+   	if(x) {
+    	window.location.href="/weblogin.cgi?mp_idx=" + mp_idx + "&replenish_flag=" + replenish_flag ;      
+	}
+}
+
+function Refresh(){
+	logout_ip_reload = true;
+	window.location.reload();
+}
+
+var browser_close_logout = browser_close_with_logout ? true : false;
+var keymap = function() {
+	var map = new Ext.KeyMap(Ext.getDoc(), [{
+		key: Ext.EventObject.F5,
+		ctrl: false,
+		fn: function(keycode, e){
+			logout_ip_reload = true; /*Logout IP*/
+		}
+	},{
+		key: Ext.EventObject.F5,
+		ctrl: true,
+		fn: function(keycode, e){
+			logout_ip_reload = true; /*Logout IP*/
+		}
+	},{
+		key: Ext.EventObject.R,
+		ctrl: true,
+		fn: function(keycode, e){
+			logout_ip_reload = true; /*Logout IP*/
+		}
+	}]);
+}
+window.onbeforeunload = function() {
+	if(browser_close_logout){
+		if(!logout_ip_reload){
+			document.logout.submit();
+			if(Ext.isChrome) {
+				return('You have been logged out.');
+			}else{
+				alert('You have been logged out.');
+			}
+		}
+		return;
+	}
+	/*Logout IP*/
+	if(!logout_ip_reload && logout_ip!=""){
+		if(Ext.isChrome) {
+			return("If you want to regain the access page, you can enter the URL:http://" + logout_ip + ".");
+		}else{
+			alert("If you want to regain the access page, you can enter the URL:http://" + logout_ip + ".");
+		}
+	}
+}
+
+function initTask(){
+	document.getElementById("uamask").style.display = (mp_idx=="preview") ?  "block" : "none";
+	document.getElementById("mp_idx_reNew").value = mp_idx;
+	document.getElementById("mp_idx_logout").value = mp_idx;
+	document.getElementById("mp_idx_timeout").value = mp_idx;
+	/* Lease time */
+	if(Lease != '0:0:0'){
+		document.getElementById('renew').style.display = '';
+		document.getElementById('leaseTime').style.display = '';
+		document.getElementById('leasetime').style.display = '';
+		_leasetime = setInterval("letime()",1000);
+	}else if(Lease == '0:0:0'){
+		document.getElementById('renew').style.display = 'none';
+		document.getElementById('leaseTime').style.display = 'none';
+		document.getElementById('leasetime').style.display = 'none';
+	}
+	/* Auth. time */
+	if(Auth_time != '0:0:0'){
+		document.getElementById('authTime').style.display = '';
+		document.getElementById('authtime').style.display = '';
+		_authtime = setInterval("auTime()",1000);
+	}else if(Auth_time == '0:0:0'){
+		document.getElementById('authTime').style.display = 'none';
+		document.getElementById('authtime').style.display = 'none';
+	}
+	/*Remaining Times*/
+	if(remaining_hour!='0' || remaining_min!='0' || remaining_sec!='0'){
+		document.getElementById('remainingTime').style.display = '';
+		document.getElementById('remaining_time').style.display = '';
+		_remaining = setInterval("dynamicuser()",1000);
+	}else if(remaining_hour=='0' && remaining_min=='0' && remaining_sec=='0'){
+		document.getElementById('remainingTime').style.display = 'none';
+		document.getElementById('remaining_time').style.display = 'none';
+	}
+	/* Session time */
+	if(session_hour!='0' || session_min!='0' || session_sec!= '0'){
+		document.getElementById('sessionTime').style.display = '';
+		document.getElementById('sessiontime').style.display = '';
+		_sessiontime = setInterval("Sesstime()",1000);
+	}else if(session_hour=='0' && session_min=='0' && session_sec=='0'){
+  		document.getElementById('sessionTime').style.display = 'none';
+		document.getElementById('sessiontime').style.display = 'none';
+	}
+	/* Accumulation=0  Time to Finish=1 */
+	if(do_logout!='0'){
+		document.getElementById('logouts').style.visibility="visible";
+	}else{
+		document.getElementById('logouts').style.visibility="hidden";
+	}
+	/*VPN 1T01 Maping*/
+	if(vpn_ip!=''){
+		document.getElementById('mappingAddress').style.display = '';
+		document.getElementById('vpnip').style.display = '';
+	}else{
+		document.getElementById('mappingAddress').style.display = 'none';
+		document.getElementById('vpnip').style.display = 'none';
+	}
+	/* Quota*/
+	if(remaining_total_quota!="none"){
+		if(remaining_total_quota!="0"){
+			document.getElementById('quotaT_block').style.display = '';
+		}
+		if(remaining_upload_quota!="0"){
+			document.getElementById('quotaU_block').style.display = '';
+		}
+		if(remaining_download_quota!="0"){
+			document.getElementById('quotaD_block').style.display = '';
+		}
+		if(remaining_total_quota!="0" || remaining_upload_quota!="0" || remaining_download_quota!="0"){
+			document.getElementById('rf').style.display = '';
+		}
+	}
+	
+	if(Lease != '0:0:0' && Auth_time != '0:0:0'){
+		document.getElementById('content').innerHTML = _String.content1 +''+ _String.content2 +''+_String.content3;
+	} else if(Lease != '0:0:0' && Auth_time == '0:0:0'){
+		document.getElementById('content').innerHTML = _String.content1 +''+_String.content2;
+	} else if(Lease == '0:0:0' && Auth_time != '0:0:0'){
+		document.getElementById('content').innerHTML = _String.content1 +''+_String.content3;
+	} else if(Lease == '0:0:0' && Auth_time == '0:0:0'){
+		document.getElementById('content').innerHTML = (do_logout!='0') ? _String.content1 : '';
+	}
+	if(logout_ip!=""){
+		document.getElementById('note_m').style.display = '';
+	}
+	if(replenish_flag!=0){
+		document.getElementById('replenish_button').style.display = '';
+	}
+	window.focus();
+}
+</script>
+</head>
+<body onload='setString(); keymap(); billingQuota();'>
+<div class="wrapper">
+<div class="content">
+<div id="form_wrapper" class="form_wrapper">
+<form class="loginHotel activeHotel" name="renew" action="/setuser.cgi" enctype="application/x-www-form-urlencoded" method="post" autocomplete="off" >
+<div class="hloginTop"><div class="hlogo"></div></div>
+<div class="Titletextword" id='title'></div>
+<div class="textword" id='content'></div>
+<div>
+<label id='leaseTime'></label>
+<input type="button" id='renew' name="renew" value="Renew" class="buttonBtoom" onclick='reNew()'>
+<input type="text" id="leasetime" name="leasetime" style="width:50%" maxlength="4" size="8" value= "00:00:00" readonly>
+<input type="hidden" value="renew" name="perform">
+</div>
+<div>
+<label  id='authTime'></label>
+<input type="text" id="authtime" name="authtime" value='00:00:00' style="width:50%" readonly>
+</div>
+<div>
+<label id='sessionTime'></label>
+<input type="text" id="sessiontime" name="sessiontime" maxlength="4" size="8" value= "00:00:00" style="width:50%" readonly>
+</div>
+<div id="rf" style="display:none">
+<input type="button" name="Refreshbtn" value="Refresh" class="buttonBtoom" onclick='Refresh()'>
+</div>
+<div>
+<label  id='remainingTime'></label>
+<input type="text" id="remaining_time" name="remaining_time" value='00 day, 00:00:00' style="width:50%" readonly>
+</div>
+<div id="quotaT_block" style="display:none">
+<label id='quotaT'></label>
+<input type="text" id="quotaTotal" name="quotaTotal" maxlength="10" size="10" value= "" style="width:50%" readonly>
+</div>
+<div id="quotaU_block" style="display:none">
+<label id='quotaU'></label>
+<input type="text" id="quotaUpload" name="quotaUpload" maxlength="10" size="10" value= "" style="width:50%" readonly>
+</div>
+<div id="quotaD_block" style="display:none">
+<label id='quotaD'></label>
+<input type="text" id="quotaDownload" name="quotaDownload" maxlength="10" size="10" value= "" style="width:50%" readonly>
+</div>
+<input type="hidden" id="mp_idx_reNew" name="mp_idx" value=""/>
+</form>
+<div>
+<label id='mappingAddress'></label>
+<input type="text" name="vpnip" style="width:50%" id='vpnip' value='0.0.0.0' readonly/>
+</div>
+<div id="note_m" class="note_m" style="display:none">
+<div id="note" class="note"></div>
+</div>
+<form class="loginHotel activeHotel" id="logout_form" name="logout" action="/setuser.cgi" enctype="application/x-www-form-urlencoded" method="post" autocomplete="off" target="none">
+<div class="bottom">
+<input type="button" name="replenish" value="replenish" id="replenish_button" class="buttonBtoom" style="float:left;display:none;" onClick="do_Replenish()">
+<input type="button" name='Logout' value="  Logout  " id="logouts" class="buttonBtoom" onClick="Glogout()">
+<input type="hidden" value="logout" name="perform">
+<input type="hidden" id="mp_idx_logout" name="mp_idx" value=""/>
+<div class="clear"></div>
+</div>
+</form>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<form name= 'timeout' action="/webauth_relogin.cgi"	enctype="application/x-www-form-urlencoded" method="post" autocomplete="off" >
+<input type="hidden" id="mp_idx_timeout" name="mp_idx" value=""/>
+</form>
+<div id="uamask" class="uamask"></div>
+</body>
+</html>

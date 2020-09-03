@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta http-equiv="pragma" content="no-cache">
+    <link href="$Z/css_m/jquery.mobile-1.4.2.min.css?v=181225040719" rel="stylesheet" type="text/css">
+    <link href="$Z/css_m/style.css?v=181225040719" rel="stylesheet" type="text/css">
+    <link href="$Z/css_m/theme.css?v=181225040719" rel="stylesheet" type="text/css">
+	<script src="$Z/js/jquery-1.8.2.min.js?v=181225040719"></script>
+	<script src="$Z/js/jquery.mobile-1.4.2.min.js?v=181225040719"></script>
+	<!--  -->
+	<link href="css_m/jquery.mobile-1.4.2.min.css?v=181225040719" rel="stylesheet" type="text/css">
+    <link href="css_m/style.css?v=181225040719" rel="stylesheet" type="text/css">
+	<link href="css_m/theme.css?v=181225040719" rel="stylesheet" type="text/css">
+	<script src="js/jquery-1.8.2.min.js?v=181225040719"></script>
+    <script src="js/jquery.mobile-1.4.2.min.js?v=181225040719"></script>
+<script language="JavaScript">
+	var errorNum = $E;
+	var mp_idx = "$M";
+	var ps_path = "$a";
+	var ft_path = "$b";
+	var free_time_login = 0;  /* 0:use default free time page, 1:use customized ftee time page.*/
+	var free_time_page = "$Z/free_time_m.html?mp_idx="+ mp_idx;
+	var Terms_of_Service = 0; /* If you want to enable Terms of Service, please set the value as 1 */
+	var terms_of_service_path = "$Z/terms_of_service_m.html";
+	var ns = false;
+	if (navigator.appName == "Netscape") {
+		ns = true;
+	}
+	var errorMsg = {
+	/* multi-Lingual here */
+		'0': 'Authenticated successfully',
+		'-1': 'Validate user has failed',
+		'-2': 'Login attempt on a lockout address',
+		'-3': 'Simultaneous admin or access logons or users have reached the maximum number',
+		'-4': 'You can\'t login, Please contact with Administrator.',
+		'-5': 'Account is expired.',
+		'-6': 'Run out of time period.',
+		'-7': 'Run out of total quota.',
+		'-8': 'Run out of upload quota.',
+		'-9': 'Run out of download quota.',
+		'-10': 'Reach maximum login times, please contact with administrator'
+	};
+	function setData(){
+		if(Terms_of_Service && !$('input:checkbox[name=terms_of_service_check]').is(':checked')){
+			alert("Please read and accept terms and conditions");
+			return;
+		}else{
+			document.zyform.submit();
+		}
+	}
+	function chkError(){
+		if(errorNum != 0){
+			$('#error').removeClass('hidden');
+			$('#error').html(errorMsg[errorNum]);
+		}
+		$('#user').focus();
+	}
+	function initTask(){
+		if(mp_idx=="preview"){
+			$('#uamask').css('display','block');
+		}else{
+			$('#uamask').css('display','none');
+		}
+		if(Terms_of_Service){
+			$('#terms_of_service').removeClass('hidden');
+			$('#terms_of_service_link').html("I understand and accept the <a href=\""+ terms_of_service_path +"\" target=\'_blank\'>Terms and Conditions.</a>");
+		}
+		$('#mp_idx').val(mp_idx);
+		ft_data_retention();
+		paymentService();
+		freeTime();
+	}
+	function ft_data_retention(){
+		/* Customized free_time_m.html URL Link */
+		if(free_time_login ==1 && ft_path != ""){
+			$('#account').removeClass('hidden');
+			var ft_data_retention_href = "<a href='"+ free_time_page +"' class=\"ui-btn ui-corner-all ui-btn-f\" target=\'_self\'>Click here to get a free account.</a>";
+			$('#ft_data_retention').html(ft_data_retention_href);
+		}
+	}
+	function paymentService(){
+		/* Payment Service URL Link */
+		if (ps_path != ""){
+			$('#account').removeClass('hidden');
+			var payment_href = "<a href=\"#\" target=\'_self\' class=\"ui-btn ui-corner-all ui-btn-f\" onclick=\"chkTerms(1)\">Get an account by payment</a>";
+			$('#payment').html(payment_href);
+		}
+	}
+	function freeTime(){
+		/* Free Time URL Link */
+		if (ps_path == "" && ft_path != "" && free_time_login ==0){
+			$('#account').removeClass('hidden');
+			var free_time_href = "<a href=\"#\" target=\'_self\' class=\"ui-btn ui-corner-all ui-btn-f\" onclick=\"chkTerms(0)\">Get a free account</a>";
+			$('#free').html(free_time_href);
+		}
+	}
+	function chkTerms(f){
+		if(Terms_of_Service && !$('input:checkbox[name=terms_of_service_check]').is(':checked')){
+			alert("Please read and accept terms and conditions");
+			return;
+		}else{
+			if(f){
+				window.location.href = "/"+ ps_path + "&mobile=1" + "&free_time_login=" + free_time_login;
+			}else{
+				window.location.href = "/"+ ft_path + "&mobile=1";
+			}
+		}			
+	}
+	function walledGarden(){
+		/* Walled Garden List*/
+		var w = $w;
+		if( w != 0){
+			$('#walled_garden').removeClass('hidden');
+			var list="", temp;
+			for (i=0; i < w.length; i++){
+				var data = w[i];
+				for (var key in data){
+					temp = "<a href="+ data[key] +" target=\'_blank\' class=\"ui-btn ui-corner-all ui-btn-icon-right ui-icon-action ui-nodisc-icon ui-btn-g\">" + key + "</a>";
+					list += temp;
+				}
+			}
+			$('#url').html(list);
+		}
+	}
+</script>
+</head>
+<body onload="initTask(); chkError(); walledGarden();">
+
+<div data-role="page" class="zyxel zyxel_style1">
+
+  	<div data-role="header" class="zyxel_header">
+		<h1><img src="images_m/logo_70X20_white.png?v=181225040719" width="70" height="20" alt="logo"></h1>
+ 	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+		<div class="zyxel_content">    
+            <h2 class="zyxel_title1">Login</h2>
+            <!--<a href="#" class="ui-btn ui-corner-all ui-btn-inline ui-btn-h btn_login_help_style" target="_blank">?  Help</a>-->
+   	    	<div class="zyxel_blue_line"></div>
+            
+			<div><!-- add class "login_hidden" here to hide without-login area -->
+            
+				<div class="flow_hidden">
+                    <div class="zyxel_login_rwd_con_right">
+                        <form name="zyform" action="/" enctype="application/x-www-form-urlencoded" method="post" autocomplete="off">
+                            <label for="user" class="ui-hidden-accessible">User Name</label>
+                            <input type="text" name="username" id="user" value=""  placeholder="Username" class="user_icon">
+                            <label for="password" class="ui-hidden-accessible">Password: data-clear-btn="true"</label>
+                            <input type="password" name="password" id="password" value="" autocomplete="off"  placeholder="Password" class="password_icon">
+                            
+                            <div id="terms_of_service" class="zyxel_checkbox hidden">
+                                <input name="terms_of_service_check" type="checkbox">
+                                <span id="terms_of_service_link"></span>
+                            </div>
+                            
+                            <div class="center_style"><span id="error" class="zyxel_span_login_denied hidden"></span></div>
+							<input type="hidden" id="mp_idx" name="mp_idx"/>
+							<input type="hidden" id="mobile" name="mobile" value="1"/>
+                            <button type="button" class="ui-btn ui-corner-all ui-btn-d" onclick="setData()">Login</button>
+                        </form>
+                        
+                        <div id="account" class="hidden">
+                            <div id="divider" class="divider">
+                                <div><span>or</span></div>
+                            </div>
+							<div id="ft_data_retention"></div>
+                            <div id="payment"></div>
+							<div id="free"></div>
+                        </div>
+                        
+                        <!--<div class="center_style"><span class="zyxel_span_note_style">Without an account? Click botton to get an account by online payment.</span></div>-->
+                    </div><!-- /zyxel_login_rwd_con_right -->
+                    
+                    <div id="walled_garden" class="zyxel_login_rwd_con_left hidden">
+                        <!--<h2 class="zyxel_title">Without Login</h2>-->
+                        <div class="zyxel_blue_line2 blueline_hidden_rwd"></div>
+                        <p class="zyxel_p_style_hidden">Without login you can go to the website.</p>
+						<div id="url"><div>
+                    </div><!-- /zyxel_login_rwd_con_left -->
+             	</div><!-- /lflow_hidden-->
+             
+             </div>
+             
+             <div class="switch"><a href="#" id="PCLink" class="desktop">View Desktop Version</a></div>
+             
+     	</div><!-- /zyxel_content -->
+	</div><!-- /content -->
+<div id="uamask" class="uamask"></div>
+</div><!-- /page -->
+<script>
+$(document).ready(function() {
+    $('#PCLink').click(function(){
+       window.location = "/redirect.cgi?arip=0.0.0.0&mobile=0";
+    });
+});
+</script>
+</body>
+</html>

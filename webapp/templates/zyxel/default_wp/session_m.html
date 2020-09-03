@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+	<meta charset="utf-8">
+	<meta http-equiv="pragma" content="no-cache">
+    <link href="$Z/css_m/jquery.mobile-1.4.2.min.css?v=181225040720" rel="stylesheet" type="text/css">
+    <link href="$Z/css_m/style.css?v=181225040720" rel="stylesheet" type="text/css">
+	<link href="$Z/css_m/theme.css?v=181225040720" rel="stylesheet" type="text/css">
+	<script src="$Z/js/jquery-1.8.2.min.js?v=181225040720"></script>
+	<script src="$Z/js/jquery.mobile-1.4.2.min.js?v=181225040720"></script>
+	<!--  -->
+	<link href="css_m/jquery.mobile-1.4.2.min.css?v=181225040720" rel="stylesheet" type="text/css">
+    <link href="css_m/style.css?v=181225040720" rel="stylesheet" type="text/css">
+	<link href="css_m/theme.css?v=181225040720" rel="stylesheet" type="text/css">
+	<script src="js/jquery-1.8.2.min.js?v=181225040720"></script>
+    <script src="js/jquery.mobile-1.4.2.min.js?v=181225040720"></script>
+<script language="javascript">
+var ahours = $h;
+var aminutes = $m;
+var asec =$s;
+var session_hour = $X;
+var session_min = $Y;
+var session_sec = $e;
+var Lhours =$u;
+var Lminutes = $l;
+var LSecs = $r;
+var DifferenceHour = -1;
+var DifferenceMinute = -1;
+var DifferenceSecond = -1;
+var Aday = new Date();
+var Lday = new Date();
+var Rday = new Date();
+var Sday = new Date();
+var _leasetime, _authtime, _remaining, _sessiontime;
+var username = '$n';
+var due_str = '$d'.split('-');
+var Leasesec = $r;
+var vpn_ip = '$v';
+var remaining_hour = $b;
+var remaining_min = $c;
+var remaining_sec = $E;
+var remaining_total_quota = '$T';
+var remaining_upload_quota = '$U';
+var remaining_download_quota = '$D';
+var do_logout = '$f'; /* control logout button's display*/
+var accumulation_flag = '$F';
+var logout_ip = '$H';
+var mp_idx = '$M';
+var replenish_flag = $R;
+var trial_flag = $Tr;
+
+/* Lease Times*/
+Lday.setHours(Lday.getHours()+Lhours, Lday.getMinutes()+Lminutes, Lday.getSeconds()+Leasesec);
+/* Auth. Time */
+Aday.setHours(Aday.getHours()+ahours, Aday.getMinutes()+aminutes, Aday.getSeconds()+asec);
+/*Remaining Times*/
+Rday.setHours(Rday.getHours()+remaining_hour, Rday.getMinutes()+remaining_min, Rday.getSeconds()+remaining_sec);
+/* Session. Time */
+Sday.setHours(Sday.getHours()+session_hour, Sday.getMinutes()+session_min, Sday.getSeconds()+session_sec);
+
+var daysms = 24 * 60 * 60 * 1000;
+var hoursms = 60 * 60 * 1000;
+var Secondms = 60 * 1000;
+var microsecond = 1000;
+var Auth_time = ahours+':'+aminutes+':'+asec;
+var Lease = Lhours+ ':' + Lminutes+':'+Leasesec;
+
+function auTime(){
+	var curtime = new Date();
+	var Diffms = Aday.getTime() - curtime.getTime();
+	if(Diffms < 0){
+		clearInterval(_leasetime);
+		clearInterval(_authtime);
+		clearInterval(_sessiontime);
+		alert("Authentication Timeout.");
+		document.timeout.submit();
+		return;
+  	}
+	DifferenceHour = Math.floor(Diffms / daysms);
+  	Diffms -= DifferenceHour * daysms;
+	DifferenceMinute = Math.floor(Diffms / hoursms);
+	Diffms -= DifferenceMinute * hoursms;
+	DifferenceSecond = Math.floor(Diffms / Secondms);
+  	Diffms -= DifferenceSecond * Secondms;
+	var dSecs = Math.floor(Diffms / microsecond);
+
+ 	var diffAuthMin = time_format(DifferenceMinute, "00");
+	var diffAuthSec = time_format(DifferenceSecond, "00");
+	var dAuthSec = time_format(dSecs, "00");
+	
+	if(due_str == 'none'){
+		$('#AT').html( diffAuthMin+":"+diffAuthSec+":"+dAuthSec );
+	}else{
+		$('#AT').html( due_str[0]+'/'+due_str[1]+'/'+due_str[2]+' '+due_str[3]+':'+due_str[4] );
+	}
+}
+function letime(){
+	var curtime = new Date();
+	var Diffms = Lday.getTime() - curtime.getTime();
+	if(Diffms < 0){
+		clearInterval(_leasetime);
+		clearInterval(_authtime);
+		clearInterval(_sessiontime);
+		alert("Lease Timeout.");
+		document.timeout.submit();
+		return;
+  	}
+	DifferenceHour = Math.floor(Diffms / daysms);
+ 	Diffms -= DifferenceHour * daysms;
+	DifferenceMinute = Math.floor(Diffms / hoursms);
+  	Diffms -= DifferenceMinute * hoursms;
+	DifferenceSecond = Math.floor(Diffms / Secondms);
+  	Diffms -= DifferenceSecond * Secondms;
+
+	var dSecs = Math.floor(Diffms / microsecond);
+  	var diffMin = time_format(DifferenceMinute, "00");
+	var diffSec = time_format(DifferenceSecond, "00");
+	var dSec = time_format(dSecs, "00");
+	$('#LT').html( diffMin+":"+diffSec+":"+dSec );
+}
+function dynamicuser(){
+	var curtime = new Date();
+	var convertHour = DifferenceHour;
+	var convertMinute = DifferenceMinute;
+	var convertSecond = DifferenceSecond;
+	
+	var Diffms = Rday.getTime() - curtime.getTime();
+	if(Diffms < 0){
+		clearInterval(_remaining);/*stop interval */
+		alert("Lease Timeout.");
+		document.timeout.submit();
+		return;
+	}
+	DifferenceHour = Math.floor(Diffms / daysms);
+	Diffms -= DifferenceHour * daysms;
+	DifferenceMinute = Math.floor(Diffms / hoursms);
+	Diffms -= DifferenceMinute * hoursms;
+	DifferenceSecond = Math.floor(Diffms / Secondms);
+	Diffms -= DifferenceSecond * Secondms;
+
+	var dSecs = Math.floor(Diffms / microsecond);
+	
+	var diffday = time_format(DifferenceHour, "00")
+	var diffMin = time_format(DifferenceMinute, "00");
+	var diffSec = time_format(DifferenceSecond, "00");
+	var dSec = time_format(dSecs, "00");
+	$('#RT').html( diffday+" day, "+diffMin+":"+diffSec+":"+dSec );
+}
+function sesstime(){
+	var curtime = new Date();
+	var Diffms = Sday.getTime() - curtime.getTime();
+
+	if(Diffms < 0){
+		clearInterval(_leasetime);
+		clearInterval(_authtime);
+		clearInterval(_sessiontime);
+		alert("Session Timeout.");
+		document.timeout.submit();
+		return;
+  	}
+	DifferenceHour = Math.floor(Diffms / daysms);
+ 	Diffms -= DifferenceHour * daysms;
+	DifferenceMinute = Math.floor(Diffms / hoursms);
+  	Diffms -= DifferenceMinute * hoursms;
+	DifferenceSecond = Math.floor(Diffms / Secondms);
+	Diffms -= DifferenceSecond * Secondms;
+
+	var dSecs = Math.floor(Diffms / microsecond);
+ 	var diffMin = time_format(DifferenceMinute, "00");
+	var diffSec = time_format(DifferenceSecond, "00");
+	var dSec = time_format(dSecs, "00");
+	$('#ST').html( diffMin+":"+diffSec+":"+dSec );
+}
+
+function time_format( covert_data, str_format ){
+	var str = covert_data.toString().replace(" ", "");
+	var length_add = str_format.length - str.length;
+	var str = str_format.substring(0,length_add) + str;
+	return str;
+}
+
+function refresh(){
+	window.location.reload();
+}
+function logout(){
+	document.logout.submit();
+}
+function redirect_replenish(){
+	window.location.href="/weblogin.cgi?mp_idx=" + mp_idx + "&replenish_flag=" + replenish_flag + "&mobile=1";
+}
+function do_Replenish(){
+    if(trial_flag) {
+        $("#lnkDialog").click();
+    } else {
+        redirect_replenish();
+    }
+}
+
+function initTask(){
+	if(mp_idx=="preview"){
+		$('#uamask').css('display','block');
+	}else{
+		$('#uamask').css('display','none');
+	}
+	var dialog = $('.ui-dialog').attr('id');
+	if((logout_ip!="") && (dialog!='dialog_logout')){
+		alert('If you want to regain the access page, you can enter the URL:http://' + logout_ip + '.');
+	}
+	/* Title*/
+	$('#title').html("<span>" + username + "</span>, you now have logged in.");
+	 /* Lease time */
+	if(Lease != '0:0:0'){
+		$('#leaseTime').removeClass('hidden');
+		_leasetime = setInterval("letime()",1000);
+	}
+	/* Auth. time */
+	if(Auth_time != '0:0:0'){
+		$('#authTime').removeClass('hidden');
+		_authtime = setInterval("auTime()",1000);
+	}
+	/*Remaining Times*/
+	if(remaining_hour!='0' || remaining_min!='0' || remaining_sec!='0'){
+		$('#remainingTime').removeClass('hidden');
+		_remaining = setInterval("dynamicuser()",1000);
+	}
+	/* Session time */
+	if(session_hour!='0' || session_min!='0' || session_sec!= '0'){
+		$('#sessionTime').removeClass('hidden');
+		_sessiontime = setInterval("sesstime()",1000);
+	}
+	/* Quota*/
+	if(remaining_total_quota!="none"){
+		if(remaining_total_quota!="0"){
+			$('#quotaTotal').removeClass('hidden');
+			$('#QT').html( remaining_total_quota );
+		}
+		if(remaining_upload_quota!="0"){
+			$('#quotaUpload').removeClass('hidden');
+			$('#QU').html( remaining_upload_quota );
+		}
+		if(remaining_download_quota!="0"){
+			$('#quotaDonwnload').removeClass('hidden');
+			$('#QD').html( remaining_download_quota );
+		}
+		if(remaining_total_quota!="0" || remaining_upload_quota!="0" || remaining_download_quota!="0"){
+			$('#refresh-btn').removeClass('hidden');
+		}
+	}
+	/* VPN 1-1 Mapping */
+	if(vpn_ip!=''){
+		$('#VPN1to1').removeClass('hidden');
+		$('#mapIP').html( vpn_ip );
+	}
+	/* Accumulation=1  Time to Finish=0 */
+	if(do_logout!='0'){
+		$('#logout-btn').removeClass('hidden');
+	}
+	if((logout_ip!='')){
+		$('#logout_ip').removeClass('hidden');
+		$('#logout_ip').html('If you want to regain the access page,you can enter the URL:http://'+ logout_ip +'.');
+	}
+    if(replenish_flag == '1') {
+        $('#replenish-btn').removeClass('hidden');
+    }   
+	$('#mp_idx_logout').val(mp_idx);
+	$('#mp_idx_timeout').val(mp_idx);
+	window.focus();
+}
+
+</script>
+</head>
+<body onload='initTask();'>
+
+<div data-role="page" class="zyxel zyxel_style1" id="session">
+
+  	<div data-role="header" class="zyxel_header">
+		<!-- <h1><img src="$Z/images_m/logo_70X20_white.png?v=181225040720" width="70" height="20" alt="logo"></h1> -->
+		<h1><img src="images_m/logo_70X20_white.png?v=181225040720" width="70" height="20" alt="logo"></h1>
+        <a href="#dialog_logout" id="logout-btn" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-logout-gray ui-nodisc-icon logout_style hidden" data-rel="dialog" data-transition="pop">Logout</a>
+        <a href="#" id="replenish-btn" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-logout-gray ui-nodisc-icon logout_style hidden" data-rel="dialog" data-transition="pop" onClick="do_Replenish()">Replenish</a>
+        <a href="#dialog_replenish" id='lnkDialog' data-rel="dialog" data-transition="pop" style='display:none;'></a>         
+  	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+    	<p id="title" class="zyxel_p_style5_session"></p>
+		<div class="zyxel_content">    
+            <h2 class="zyxel_title">Session</h2>
+            <div class="zyxel_blue_line"></div>
+            <div class="right_style">
+            	<button id="refresh-btn" type="button" onclick="refresh()" class="ui-btn ui-corner-all ui-btn-inline ui-btn-d ui-btn-icon-left ui-icon-refresh ui-nodisc-icon btn_inline_style hidden">Refresh</button>
+            </div>
+            
+            <div class="session_time_box">
+                <div class="hidden">
+                    <h3 class="zyxel_h3_style">-User-defined lease time(max 1440 minutes)</h3>
+                    <input type="checkbox" name="checkbox-mini-0" id="checkbox-mini-0" data-mini="true">
+                    <label for="checkbox-mini-0"  class="checkbox_style2">Updating lease time automatically.</label>
+                    <p class="zyxel_p_style2 icon_time1">1440</p>
+                </div>
+                
+                <div id="remainingTime" class="hidden">
+                    <h3 class="zyxel_h3_style">-Remaining time before lease timeout (hh:mm:ss)</h3>
+                    <p id="RT" class="zyxel_p_style2 icon_time1">00 day, 00:00:00</p>
+                </div>
+                
+                <div id="leaseTime" class="hidden">
+                    <h3 class="zyxel_h3_style">-Remaining time before lease timeout (hh:mm:ss)</h3>
+                    <p id="LT" class="zyxel_p_style2 icon_time1">00:00:00</p>
+                </div>
+                
+	      		<div id="authTime" class="hidden">
+                    <h3 class="zyxel_h3_style">Remaining time before auth timeout (hh:mm:ss)</h3>
+                    <p id="AT" class="zyxel_p_style2 icon_time1">00:00:00</p>
+                </div>
+				
+                <div id="sessionTime" class="hidden">
+                    <h3 class="zyxel_h3_style">Remaining time before session timeout (hh:mm:ss)</h3>
+                    <p id="ST" class="zyxel_p_style2 icon_time1">00:00:00</p>
+                </div>
+				
+              	<div id="quotaTotal" class="hidden">
+                    <h3 class="zyxel_h3_style">-Total remaining quota</h3>
+                    <p id="QT" class="zyxel_p_style2 icon_total">0.0 MB</p>
+                </div>
+                
+            	<div id="quotaUpload" class="hidden">
+                    <h3 class="zyxel_h3_style">-Upload remaining quota</h3>
+                    <p id="QU" class="zyxel_p_style2 icon_upload">0.0 MB</p>
+                </div>
+                
+                <div id="quotaDonwnload" class="hidden">
+                    <h3 class="zyxel_h3_style">-Download remaining quota</h3>
+                    <p id="QD" class="zyxel_p_style2 icon_download">0.0 MB</p>
+                </div>
+                
+                <div id="VPN1to1" class="hidden">
+                    <h3 class="zyxel_h3_style">-Mapped Public IP Address</h3>
+                    <p id="mapIP" class="zyxel_p_style2 icon_info">Default</p>
+                </div>
+                
+            </div><!-- /session_time_box -->
+            
+            <div class="center_style"><span id="logout_ip" class="zyxel_span_note_style hidden"></span></div>
+     	
+        </div><!-- /zyxel_content -->
+	</div><!-- /content -->
+    <div id="uamask" class="uamask"></div>
+</div><!-- /page -->
+
+
+<!-- Start of second page: #dialog_logout -->
+
+<div data-role="dialog" data-close-btn="none" id="dialog_logout">
+	<div data-role="header">
+		<h1>Logout</h1>
+	</div><!-- /header -->
+
+	<div role="main" class="ui-content">
+      	<p class="zyxel_p_style4_info">Are you sure you want to logout?</p>
+		<a href="javascript:logout()" class="ui-btn ui-corner-all ui-btn-d">Yes</a>
+        <a href="#session" data-rel="back" class="ui-btn ui-corner-all ui-btn-f">Cancel</a>
+	</div><!-- /content -->
+</div><!-- /page dialog_logout -->
+<div data-role="dialog" data-close-btn="none" id="dialog_replenish">
+    <div data-role="header">
+        <h1 id="replenish_header">Replenish Service</h1>
+    </div><!-- /header -->
+    <div role="main" class="ui-content">
+        <p class="zyxel_p_style4_info">When Free-Time account upgrade to billing account. Remaining time of account erase.</p>
+        <a href="javascript:redirect_replenish()" class="ui-btn ui-corner-all ui-btn-d">Yes</a>
+        <a href="#session" data-rel="back" class="ui-btn ui-corner-all ui-btn-f ">Cancel</a>
+    </div><!-- /content -->
+</div><!-- /page dialog_replenish-->
+<form name="logout" action="/setuser.cgi" enctype="application/x-www-form-urlencoded" method="post" autocomplete="off" >
+<input type="hidden" value="logout" name="perform">
+<input type="hidden" id="mobile" name="mobile" value="1"/>
+<input type="hidden" id="mp_idx_logout" name="mp_idx" value=""/>
+</form>
+<form name= 'timeout' action="/webauth_relogin.cgi"	enctype="application/x-www-form-urlencoded" method="post" autocomplete="off" >
+<input type="hidden" id="mp_idx_timeout" name="mp_idx" value=""/>
+<input type="hidden" id="mobile" name="mobile" value="1"/>
+</form>
+</body>
+</html>

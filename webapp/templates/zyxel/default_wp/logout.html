@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+<title>Logout</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="shortcut icon" href="$Z/images/logo.ico" type="image/x-icon"/>
+<link rel="stylesheet" type="text/css" href="$Z/css/portal.css?v=181225040720">
+<!--  -->
+<link rel="shortcut icon" href="images/logo.ico" type="image/x-icon"/>
+<link rel="stylesheet" type="text/css" href="css/portal.css?v=181225040720">
+<script language="javascript">
+var mp_idx = "$M";
+function initTask(){
+		document.getElementById("uamask").style.display = (mp_idx=="preview") ?  "block" : "none";
+		document.getElementById("mp_idx").value = mp_idx;
+	}
+</script>
+</head>
+<body onload='initTask();'>
+<div class="wrapper">
+<div class="content">
+<div id="form_wrapper" class="form_wrapper">
+<form name="relogin" action="/webauth_relogin.cgi" enctype="application/x-www-form-urlencoded" method="post" autocomplete="off" class="loginHotel activeHotel" >
+<div class="hloginTop">
+<div class="hlogo"></div>
+</div>
+<div class="Titletextword">Thank you for choosing to use the portal.</div>
+<div>
+<div class="hByeconnection"></div>
+<label>Your Internet is safer, faster, and smarter because you're using portal. Thank you!</label>
+</div>
+<div class="bottom">
+<input type="hidden" value="relogin" name="perform">
+<input type="hidden" id="mp_idx" name="mp_idx" value=""/>
+<input type="submit" onclick="" value="Re-Login" class="buttonBtoom">
+<div class="clear"></div>
+</div>
+</form>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<div id="uamask" class="uamask"></div>
+</body>
+</html>

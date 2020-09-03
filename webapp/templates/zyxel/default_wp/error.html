@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+<title>Error Page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="shortcut icon" href="$Z/images/logo.ico" type="image/x-icon"/>
+<link rel="stylesheet" type="text/css" href="$Z/css/portal.css?v=181225040719">
+<script language="JavaScript">
+var mp_idx = "$M";
+var errorMessage = {
+	/* multi-Lingual here */
+	'0': 'Authenticated successfully',
+	'-1': 'Validate user has failed',
+	'-2': 'Login attempt on a lockout address',
+	'-3': 'Simultaneous admin or access logons or users have reached the maximum number',
+	'-4': 'You can\'t login, Please contact with Administrator.',
+	'-5': 'Account is expired.',
+	'-6': 'Run out of time period.',
+	'-7': 'Run out of total quota.',
+	'-8': 'Run out of upload quota.',
+	'-9': 'Run out of download quota.',
+	'-10': 'Reach maximum login times, please contact with administrator'
+};
+function initTask(){
+	document.getElementById("uamask").style.display = (mp_idx=="preview") ?  "block" : "none";
+}
+function doClose(){
+	/* close window, no confirm prompt */
+	window.opener = null;   
+	window.open("","_self");   
+	window.close();
+}
+</script>
+</head>
+<body onload='initTask();'>
+<div class="wrapper">
+<div class="content">
+<div id="form_wrapper" class="form_wrapper">
+<form class="loginHotel activeHotel">
+<div class="hloginTop">
+<div class="hlogo"></div>
+</div>
+<div class="Titletextworderror"><script>document.write(errorMessage[$e])</script></div>
+<div>
+<div class="hdisconnection"></div>
+<label>Login failure. Please click "Retry" to login again.</label>
+</div>
+<div class="bottom">
+<input type="submit" value="  Retry  " onClick="doClose()" class="buttonBtoom">
+</input>
+<div class="clear"></div>
+</div>
+</form>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<div id="uamask" class="uamask"></div>
+</body>
+</html>

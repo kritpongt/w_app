@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+<title>Welcome</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="shortcut icon" href="./images/logo.ico" type="image/x-icon"/>
+<link rel="stylesheet" type="text/css" href="./css/portal.css?v=181225040720">
+<script language="JavaScript">
+	var mp_idx = getQueryString("mp_idx");
+	function getQueryString(paramName){ 
+	　　paramName = paramName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]").toLowerCase();
+	　　var reg = "[\\?&]"+paramName +"=([^&#]*)"; 
+	　　var regex = new RegExp( reg ); 
+	　　var regResults = regex.exec( window.location.href.toLowerCase() ); 
+	　　if( regResults == null ) return ""; 
+	　　else return regResults [1]; 
+	}
+	function initTask(){
+		document.getElementById("mp_idx").value = mp_idx;
+	}
+	function send_personal_info(){
+		var field = 4;
+		var lable = "";
+		for(var i=1; i <= field; i++){
+			var table = document.getElementById("td"+i);
+			lable += table.innerHTML + "!@#";
+		}
+		/*get label value*/
+		document.form.fieldname.value = lable;
+		document.form.submit();
+	}
+</script>
+</head>
+<body onload='initTask();'>
+<div class="wrapper">
+<div class="content">
+<div id="form_wrapper" class="form_wrapper">
+<form class="loginHotel activeHotel" method="post" action="/free_time.cgi" name="form">
+<div class="hloginTop">
+<div class="hlogo"></div>
+</div>
+<div class="Titletextword">Welcome</div>
+<div class="Titletextword">
+To connect, please fill in you details:
+</div>
+<div>
+	<table width="320" border="0" align="center" cellpadding="0" cellspacing="0">
+	  <tr>
+		<td id="td1">Name:</td>
+		<td colspan="2"><input type="text" name="field1" id="field1"/></td>
+	  </tr>
+	  <tr>
+		<td id="td2">Phone:</td>
+		<td colspan="2"><input type="text" name="field2" id="field2"/></td>
+	  </tr>
+	  <tr>
+		<td id="td3">Address:</td>
+		<td colspan="2"><input type="text" name="field3" id="field3"/></td>
+	  </tr>
+	  <tr>
+		<td id="td4">E-mail:</td>
+		<td colspan="2"><input type="text" name="field4" id="field4"/></td>
+	  </tr>
+	</table>
+	<input type="hidden" name="fieldname" value=""/>
+	<input type="hidden" name="ft_user_login" value="1"/> <!-- please don't modify this value. -->
+	<input type="hidden" id="mp_idx" name="mp_idx" value=""/>
+	</div>
+<div class="bottom">
+<input type="button" name="btn" value=" Connect Now! " onclick="send_personal_info();" class="buttonBtoom">
+<div class="clear"></div>
+</div>
+</form>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</body>
+</html>
