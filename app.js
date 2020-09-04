@@ -16,7 +16,7 @@ app.use('/webapp/templates/zyxel/default_wp/css', express.static(path.join(__dir
 app.use('/webapp/templates/mywebpage', express.static(path.join(__dirname,'./webapp/templates/mywebpage')))
 
 app.get('/', async(req, res) => {
-    res.sendFile(path.join(__dirname, 'test.html'))
+    res.sendFile(path.join(__dirname, 'main.html'))
 })
 
 const server = app.listen(3000, function(){
